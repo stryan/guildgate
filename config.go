@@ -24,7 +24,7 @@ func validateConfigEntry(entry string, name string) bool {
 }
 
 func LoadConfig() (*Config, error) {
-	viper.SetConfigName("guildgate.yaml")
+	viper.SetConfigName("guildgate")
 	viper.AddConfigPath("/etc/")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
