@@ -6,13 +6,19 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
+type LdapConfig struct {
 	Url       string
 	AdminUser string
 	UserAttr  string
 	UserOu    string
 	LdapDc    string
-	Secret    string
+}
+
+type Config struct {
+	Ldap   *LdapConfig
+	Secret string
+	Tls    bool
+	Port   string
 }
 
 func validateConfigEntry(entry string, name string) bool {
@@ -33,18 +39,22 @@ func LoadConfig() (*Config, error) {
 	}
 	viper.SetConfigType("yaml")
 	c := &Config{}
+	l := &LdapConfig{}
+	viper.SetDefault("port", "8080")
 	//Load configs
-	c.Url = viper.GetString("ldapUrl")
-	c.AdminUser = viper.GetString("adminUser")
-	c.UserAttr = viper.GetString("userAttr")
-	c.UserOu = viper.GetString("userOu")
-	c.LdapDc = viper.GetString("ldapDc")
+	l.Url = viper.GetString("ldapUrl")
+	l.AdminUser = viper.GetString("adminUser")
+	l.UserAttr = viper.GetString("userAttr")
+	l.UserOu = viper.GetString("userOu")
+	l.LdapDc = viper.GetString("ldapDc")
 	c.Secret = viper.GetString("secret")
+	c.Tls = viper.GetBool("tls")
+	c.Port = viper.GetString("port")
 
 	//Validate configs
-	if validateConfigEntry(c.Url, "ldapUrl") || validateConfigEntry(c.AdminUser, "adminUser") || validateConfigEntry(c.UserOu, "userOu") || validateConfigEntry(c.LdapDc, "ldapDc") || validateConfigEntry(c.UserAttr, "userAttr") {
+	if validateConfigEntry(l.Url, "ldapUrl") || validateConfigEntry(l.AdminUser, "adminUser") || validateConfigEntry(l.UserOu, "userOu") || validateConfigEntry(l.LdapDc, "ldapDc") || validateConfigEntry(l.UserAttr, "userAttr") {
 		log.Fatalf("FATAL: Error in config file, bailing")
 	}
-
+	c.Ldap = l
 	return c, nil
 }

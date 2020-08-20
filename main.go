@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-var LdapConfig *Config
+var Conf *Config
 
 func signupPage(res http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
@@ -18,12 +18,13 @@ func signupPage(res http.ResponseWriter, req *http.Request) {
 	email := req.FormValue("email")
 	secret := req.FormValue("secret")
 
-	if LdapConfig.Secret != "" && LdapConfig.Secret != secret {
+	if Conf.Secret != "" && Conf.Secret != secret {
+		log.Printf("Bad secret entered\n")
 		res.Write([]byte("Get a load of this guy, not knowing the secret code"))
 		return
 	}
 	//insert into LDAP
-	log.Printf("Got %v %v %v %v\n", username, password, email, secret)
+	log.Printf("Attempting to create account for %v", username)
 	err := createLDAPAccount(username, password, email)
 	if err == nil {
 		res.Write([]byte("User created!"))
@@ -39,11 +40,11 @@ func homePage(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	LdapConfig, _ = LoadConfig()
+	Conf, _ = LoadConfig()
 	log.Println("Loaded config")
 	http.HandleFunc("/register", signupPage)
 	http.HandleFunc("/", homePage)
-	log.Println("Guildgate starting")
-	http.ListenAndServe(":8080", nil)
+	log.Printf("Guildgate starting on %v\n", Conf.Port)
+	http.ListenAndServe(":"+Conf.Port, nil)
 
 }
