@@ -18,9 +18,9 @@ type Config struct {
 func validateConfigEntry(entry string, name string) bool {
 	if entry == "" {
 		log.Printf("Error: %v unset", name)
-		return false
+		return true
 	}
-	return true
+	return false
 }
 
 func LoadConfig() (*Config, error) {
