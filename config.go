@@ -18,6 +18,8 @@ type Config struct {
 	Ldap   *LdapConfig
 	Secret string
 	Tls    bool
+	Key    string
+	Cert   string
 	Port   string
 }
 
@@ -41,6 +43,8 @@ func LoadConfig() (*Config, error) {
 	c := &Config{}
 	l := &LdapConfig{}
 	viper.SetDefault("port", "8080")
+	viper.SetDefault("secret", "")
+	viper.SetDefault("Tls", false)
 	//Load configs
 	l.Url = viper.GetString("ldapUrl")
 	l.AdminUser = viper.GetString("adminUser")
@@ -50,6 +54,8 @@ func LoadConfig() (*Config, error) {
 	c.Secret = viper.GetString("secret")
 	c.Tls = viper.GetBool("tls")
 	c.Port = viper.GetString("port")
+	c.Key = viper.GetString("tls_key")
+	c.Cert = viper.GetString("tls_cert")
 
 	//Validate configs
 	if validateConfigEntry(l.Url, "ldapUrl") || validateConfigEntry(l.AdminUser, "adminUser") || validateConfigEntry(l.UserOu, "userOu") || validateConfigEntry(l.LdapDc, "ldapDc") || validateConfigEntry(l.UserAttr, "userAttr") {

@@ -45,6 +45,9 @@ func main() {
 	http.HandleFunc("/register", signupPage)
 	http.HandleFunc("/", homePage)
 	log.Printf("Guildgate starting on %v\n", Conf.Port)
-	http.ListenAndServe(":"+Conf.Port, nil)
-
+	if Conf.Tls {
+		http.ListenAndServeTLS(":"+Conf.Port, Conf.Cert, Conf.Key, nil)
+	} else {
+		http.ListenAndServe(":"+Conf.Port, nil)
+	}
 }
