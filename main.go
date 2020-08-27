@@ -45,9 +45,21 @@ func main() {
 	http.HandleFunc("/register", signupPage)
 	http.HandleFunc("/", homePage)
 	log.Printf("Guildgate starting on %v\n", Conf.Port)
+	var err error
 	if Conf.Tls {
-		http.ListenAndServeTLS(":"+Conf.Port, Conf.Cert, Conf.Key, nil)
+		log.Printf("Starting TLS\n")
+		if Conf.Cert == "" {
+			log.Fatalf("Need to specify a certificate if using TLS!\n")
+		} else if Conf.Key == "" {
+			log.Fatalf("Need to specify a private key is usingTLS!\n")
+		} else {
+			err = http.ListenAndServeTLS(":"+Conf.Port, Conf.Cert, Conf.Key, nil)
+		}
 	} else {
-		http.ListenAndServe(":"+Conf.Port, nil)
+		log.Printf("Starting unencrypted\n")
+		err = http.ListenAndServe(":"+Conf.Port, nil)
+	}
+	if err != nil {
+		log.Printf("HTTP server failed with %v\n", err)
 	}
 }
