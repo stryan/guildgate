@@ -1,0 +1,5 @@
+A simple LDAP login/logout too.
+
+It's quick and dirty and really only useful for my usecase, but I uploaded it in case anyone was curious or wanted a starting point.
+
+But seriously, it is *very* quick and dirty. Don't use this for anything remotely production worthy.
