@@ -4,11 +4,12 @@
 	<head>
 		<title>GuildGate</title>
 	</head>
+	<h1>Guild Gate: {{.Title}}</h1>
 	<body>
 		<nav>
-			<li>Logged in as: {{.Username}}
-<!--			<li><a href="/">Home</a></li>
-			<li><a href="/login">Login</a></li>
-			<li><a href="/logout">Logout</a></li>--!>
+			<div style="overflow: hidden;">
+				<p style="float: left;">Logged in as: {{.Username}}</p> 
+				<p style="float: right;"><a href="/">Home</a> {{if .ShowLogin}}<a href="/login">Login</a> {{end}}{{if .ShowLogout}}<a href="/logout">Logout</a>{{end}}</p>
+			</div>
 		</nav>
 {{end}}

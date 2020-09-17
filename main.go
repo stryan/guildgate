@@ -21,7 +21,18 @@ func signupPage(res http.ResponseWriter, req *http.Request) {
 		if u != "" {
 			http.Redirect(res, req, "/", 302)
 		} else {
-			tpl.ExecuteTemplate(res, "register", nil)
+			data := struct {
+				Title      string
+				Username   string
+				ShowLogin  bool
+				ShowLogout bool
+			}{
+				"Register",
+				"Unregistered",
+				false,
+				false,
+			}
+			tpl.ExecuteTemplate(res, "register", data)
 		}
 		return
 	}
@@ -55,7 +66,18 @@ func loginPage(res http.ResponseWriter, req *http.Request) {
 		if u != "" {
 			http.Redirect(res, req, "/", 302)
 		} else {
-			tpl.ExecuteTemplate(res, "login", nil)
+			data := struct {
+				Title      string
+				Username   string
+				ShowLogin  bool
+				ShowLogout bool
+			}{
+				"Login",
+				"Unregistered",
+				true,
+				false,
+			}
+			tpl.ExecuteTemplate(res, "login", data)
 		}
 		return
 	}
@@ -86,11 +108,15 @@ func homePage(res http.ResponseWriter, req *http.Request) {
 		uname = u
 	}
 	data := struct {
-		Title    string
-		Username string
+		Title      string
+		Username   string
+		ShowLogin  bool
+		ShowLogout bool
 	}{
 		"Index",
 		uname,
+		true,
+		true,
 	}
 
 	tpl.ExecuteTemplate(res, "index", data)
