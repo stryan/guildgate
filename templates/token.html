@@ -1,0 +1,11 @@
+{{ define "token" }}
+{{ template "header" .}}
+<p>The following token has been generated and can be used to register an account on this website.</p>
+<p>It is valid for 24 hours.</p>
+
+<p>To Use: Paste the following string into the "Secret" box during registration</p>
+<textarea id="token_area" name="generated_token" rows="4" cols="50">
+{{ .Token }}
+</textarea>
+{{template "footer" .}}
+{{ end }}

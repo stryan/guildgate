@@ -43,9 +43,13 @@ func signupPage(res http.ResponseWriter, req *http.Request) {
 	secret := req.FormValue("secret")
 
 	if Conf.Secret != "" && Conf.Secret != secret {
-		log.Printf("Bad secret entered\n")
-		res.Write([]byte("Get a load of this guy, not knowing the secret code"))
-		return
+		//Checking it as a token
+		err := validateToken(secret)
+		if err != nil {
+			log.Printf("Bad secret entered: %v\n", err)
+			res.Write([]byte("Get a load of this guy, not knowing the secret code"))
+			return
+		}
 	}
 	//insert into LDAP
 	log.Printf("Attempting to create account for %v", username)
@@ -101,6 +105,32 @@ func logoutPage(res http.ResponseWriter, req *http.Request) {
 	http.Redirect(res, req, "/", 302)
 }
 
+func tokenPage(res http.ResponseWriter, req *http.Request) {
+	u := getUserName(req)
+	if u == "" {
+		http.Redirect(res, req, "/", 302)
+	}
+	token, err := generateToken(u)
+	if err != nil {
+		log.Printf("Error generating token: %v", err)
+		tpl.ExecuteTemplate(res, "error", nil)
+	}
+	data := struct {
+		Title      string
+		Username   string
+		ShowLogin  bool
+		ShowLogout bool
+		Token      string
+	}{
+		"Token Generation",
+		u,
+		false,
+		true,
+		token,
+	}
+	tpl.ExecuteTemplate(res, "token", data)
+}
+
 func homePage(res http.ResponseWriter, req *http.Request) {
 	u := getUserName(req)
 	uname := "Unregistered"
@@ -128,6 +158,7 @@ func main() {
 	http.HandleFunc("/register", signupPage)
 	http.HandleFunc("/login", loginPage)
 	http.HandleFunc("/logout", logoutPage)
+	http.HandleFunc("/token", tokenPage)
 	http.HandleFunc("/", homePage)
 	log.Printf("Registering templates from %v/\n", Conf.TplPath)
 	tpl = template.Must(template.ParseGlob(Conf.TplPath + "/*.html"))
