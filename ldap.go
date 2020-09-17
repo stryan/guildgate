@@ -10,6 +10,7 @@ import (
 
 func createLDAPAccount(uname string, pwd string, email string) error {
 	if uname == "" || pwd == "" || email == "" {
+		log.Printf("error: missing field\n")
 		return errors.New("Missing field")
 	}
 	url := Conf.Ldap.Url
