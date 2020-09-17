@@ -1,8 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-<h1>Registration Form</h1>
-</head>
+{{ define "register" }}
+{{ template "header" .}}
 <body>
 	<form method="POST" action="/register">
 	<table>
@@ -26,5 +23,5 @@
 		</tr>
 	</table>
 </form> 
-</body>
-</html>
+{{ template "footer" .}}
+{{ end }}

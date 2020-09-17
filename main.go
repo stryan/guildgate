@@ -3,13 +3,26 @@ package main
 import (
 	"log"
 	"net/http"
+	"text/template"
+
+	"github.com/gorilla/securecookie"
 )
 
 var Conf *Config
+var tpl *template.Template
+var cookieHandler = securecookie.New(
+	securecookie.GenerateRandomKey(64),
+	securecookie.GenerateRandomKey(32))
 
 func signupPage(res http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
-		http.ServeFile(res, req, "register.html")
+		log.Println("GET /register")
+		u := getUserName(req)
+		if u != "" {
+			http.Redirect(res, req, "/", 302)
+		} else {
+			tpl.ExecuteTemplate(res, "register", nil)
+		}
 		return
 	}
 
@@ -35,15 +48,63 @@ func signupPage(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func loginPage(res http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" {
+		log.Println("GET /login")
+		u := getUserName(req)
+		if u != "" {
+			http.Redirect(res, req, "/", 302)
+		} else {
+			tpl.ExecuteTemplate(res, "login", nil)
+		}
+		return
+	}
+	username := req.FormValue("username")
+	password := req.FormValue("password")
+	log.Printf("Attempting login for user %v\n", username)
+	err := loginLDAPAccount(username, password)
+	if err != nil {
+		log.Printf("Error logging in user %v: %v\n", username, err)
+		res.Write([]byte("Error logging in. Incorrect password?"))
+		return
+	} else {
+		setSession(username, res)
+		http.Redirect(res, req, "/", 302)
+		return
+	}
+}
+
+func logoutPage(res http.ResponseWriter, req *http.Request) {
+	clearSession(res)
+	http.Redirect(res, req, "/", 302)
+}
+
 func homePage(res http.ResponseWriter, req *http.Request) {
-	http.ServeFile(res, req, "index.html")
+	u := getUserName(req)
+	uname := "Unregistered"
+	if u != "" {
+		uname = u
+	}
+	data := struct {
+		Title    string
+		Username string
+	}{
+		"Index",
+		uname,
+	}
+
+	tpl.ExecuteTemplate(res, "index", data)
 }
 
 func main() {
 	Conf, _ = LoadConfig()
 	log.Println("Loaded config")
 	http.HandleFunc("/register", signupPage)
+	http.HandleFunc("/login", loginPage)
+	http.HandleFunc("/logout", logoutPage)
 	http.HandleFunc("/", homePage)
+	log.Printf("Registering templates from %v/\n", Conf.TplPath)
+	tpl = template.Must(template.ParseGlob(Conf.TplPath + "/*.html"))
 	log.Printf("Guildgate starting on %v\n", Conf.Port)
 	var err error
 	if Conf.Tls {

@@ -12,15 +12,17 @@ type LdapConfig struct {
 	UserAttr  string
 	UserOu    string
 	LdapDc    string
+	LdapPass  string
 }
 
 type Config struct {
-	Ldap   *LdapConfig
-	Secret string
-	Tls    bool
-	Key    string
-	Cert   string
-	Port   string
+	Ldap    *LdapConfig
+	Secret  string
+	TplPath string
+	Tls     bool
+	Key     string
+	Cert    string
+	Port    string
 }
 
 func validateConfigEntry(entry string, name string) bool {
@@ -51,11 +53,13 @@ func LoadConfig() (*Config, error) {
 	l.UserAttr = viper.GetString("userAttr")
 	l.UserOu = viper.GetString("userOu")
 	l.LdapDc = viper.GetString("ldapDc")
+	l.LdapPass = viper.GetString("ldapPass")
 	c.Secret = viper.GetString("secret")
 	c.Tls = viper.GetBool("tls")
 	c.Port = viper.GetString("port")
 	c.Key = viper.GetString("tls_key")
 	c.Cert = viper.GetString("tls_cert")
+	c.TplPath = viper.GetString("templates_path")
 
 	//Validate configs
 	if validateConfigEntry(l.Url, "ldapUrl") || validateConfigEntry(l.AdminUser, "adminUser") || validateConfigEntry(l.UserOu, "userOu") || validateConfigEntry(l.LdapDc, "ldapDc") || validateConfigEntry(l.UserAttr, "userAttr") {
