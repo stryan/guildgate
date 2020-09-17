@@ -9,6 +9,9 @@ import (
 )
 
 func createLDAPAccount(uname string, pwd string, email string) error {
+	if uname == "" || pwd == "" || email == "" {
+		return errors.New("Missing field")
+	}
 	url := Conf.Ldap.Url
 	newdn := fmt.Sprintf("%v=%v,%v,%v", Conf.Ldap.UserAttr, uname, Conf.Ldap.UserOu, Conf.Ldap.LdapDc)
 	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)
