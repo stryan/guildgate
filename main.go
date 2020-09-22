@@ -22,14 +22,12 @@ func signupPage(res http.ResponseWriter, req *http.Request) {
 			http.Redirect(res, req, "/", 302)
 		} else {
 			data := struct {
-				Title      string
-				Username   string
-				ShowLogin  bool
-				ShowLogout bool
+				Title    string
+				Username string
+				LoggedIn bool
 			}{
 				"Register",
 				"Unregistered",
-				false,
 				false,
 			}
 			tpl.ExecuteTemplate(res, "register", data)
@@ -71,14 +69,12 @@ func loginPage(res http.ResponseWriter, req *http.Request) {
 			http.Redirect(res, req, "/", 302)
 		} else {
 			data := struct {
-				Title      string
-				Username   string
-				ShowLogin  bool
-				ShowLogout bool
+				Title    string
+				Username string
+				LoggedIn bool
 			}{
 				"Login",
 				"Unregistered",
-				true,
 				false,
 			}
 			tpl.ExecuteTemplate(res, "login", data)
@@ -116,15 +112,13 @@ func tokenPage(res http.ResponseWriter, req *http.Request) {
 		tpl.ExecuteTemplate(res, "error", nil)
 	}
 	data := struct {
-		Title      string
-		Username   string
-		ShowLogin  bool
-		ShowLogout bool
-		Token      string
+		Title    string
+		Username string
+		LoggedIn bool
+		Token    string
 	}{
 		"Token Generation",
 		u,
-		false,
 		true,
 		token,
 	}
@@ -133,20 +127,20 @@ func tokenPage(res http.ResponseWriter, req *http.Request) {
 
 func homePage(res http.ResponseWriter, req *http.Request) {
 	u := getUserName(req)
+	active := false
 	uname := "Unregistered"
 	if u != "" {
 		uname = u
+		active = true
 	}
 	data := struct {
-		Title      string
-		Username   string
-		ShowLogin  bool
-		ShowLogout bool
+		Title    string
+		Username string
+		LoggedIn bool
 	}{
 		"Index",
 		uname,
-		true,
-		true,
+		active,
 	}
 
 	tpl.ExecuteTemplate(res, "index", data)

@@ -1,6 +1,9 @@
 {{ define "index" }}
 {{ template "header" .}}
-<p><a href="/register">Register</a></p>
+{{if .LoggedIn }}
 <p><a href="/token">Get Token</a></p>
+{{else}}
+<p><a href="/register">Register</a></p>
+{{end}}
 {{template "footer" .}}
 {{ end }}
