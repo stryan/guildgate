@@ -5,6 +5,73 @@ import (
 	"net/http"
 )
 
+func resetPageFront(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /passwordreset")
+	u := getUserName(req)
+	if u != "" {
+		http.Redirect(res, req, "/", 302) //TODO create password change form, direct to that
+	} else {
+		data := struct {
+			Title    string
+			Username string
+			LoggedIn bool
+		}{
+			"Reset Password",
+			"Unregistered",
+			false,
+		}
+		tpl.ExecuteTemplate(res, "reset_password_page_front", data)
+	}
+}
+
+func resetPageBack(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /passwordresetform")
+	u := getUserName(req)
+	if u != "" {
+		http.Redirect(res, req, "/", 302) //TODO create password change form, direct to that
+	} else {
+		data := struct {
+			Title    string
+			Username string
+			LoggedIn bool
+		}{
+			"Reset Password",
+			"Unregistered",
+			false,
+		}
+		tpl.ExecuteTemplate(res, "reset_password_page_back", data)
+	}
+}
+func resetSuccessPage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /resetsuccess")
+	data := struct {
+		Title    string
+		Username string
+		LoggedIn bool
+	}{
+		"Reset Password Success",
+		"Unregistered",
+		false,
+	}
+	tpl.ExecuteTemplate(res, "reset_success", data)
+	return
+}
+func resetErrorPage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /reseterror")
+	data := struct {
+		Title    string
+		Username string
+		LoggedIn bool
+		Error    string
+	}{
+		"Reset Password Failure",
+		"Unregistered",
+		false,
+		"Undefined",
+	}
+	tpl.ExecuteTemplate(res, "reset_error", data)
+	return
+}
 func signupPage(res http.ResponseWriter, req *http.Request) {
 	log.Println("GET /register")
 	u := getUserName(req)
@@ -46,12 +113,14 @@ func loginPage(res http.ResponseWriter, req *http.Request) {
 }
 
 func logoutPage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /logout")
 	logout(res, req)
 	tpl.ExecuteTemplate(res, "logout", nil)
 	return
 }
 
 func tokenPage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /token")
 	u := getUserName(req)
 	if u == "" {
 		http.Redirect(res, req, "/", 302)

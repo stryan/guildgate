@@ -15,8 +15,16 @@ type LdapConfig struct {
 	LdapPass  string
 }
 
+type MailConfig struct {
+	Username   string
+	Password   string
+	SmtpServer string
+	SmtpPort   int
+}
+
 type Config struct {
 	Ldap    *LdapConfig
+	Mail    *MailConfig
 	Secret  string
 	TplPath string
 	Tls     bool
@@ -44,6 +52,7 @@ func LoadConfig() (*Config, error) {
 	viper.SetConfigType("yaml")
 	c := &Config{}
 	l := &LdapConfig{}
+	m := &MailConfig{}
 	viper.SetDefault("port", "8080")
 	viper.SetDefault("secret", "")
 	viper.SetDefault("Tls", false)
@@ -60,11 +69,16 @@ func LoadConfig() (*Config, error) {
 	c.Key = viper.GetString("tls_key")
 	c.Cert = viper.GetString("tls_cert")
 	c.TplPath = viper.GetString("templates_path")
+	m.SmtpServer = viper.GetString("SmtpServer")
+	m.Username = viper.GetString("SmtpUsername")
+	m.Password = viper.GetString("SmtpPassword")
+	m.SmtpPort = viper.GetInt("SmtpPort")
 
 	//Validate configs
 	if validateConfigEntry(l.Url, "ldapUrl") || validateConfigEntry(l.AdminUser, "adminUser") || validateConfigEntry(l.UserOu, "userOu") || validateConfigEntry(l.LdapDc, "ldapDc") || validateConfigEntry(l.UserAttr, "userAttr") {
 		log.Fatalf("FATAL: Error in config file, bailing")
 	}
 	c.Ldap = l
+	c.Mail = m
 	return c, nil
 }

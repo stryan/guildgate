@@ -1,0 +1,9 @@
+{{ define "reset_pass" }}
+Hi {{.Name}},
+
+    Enclosed in this message is your Password Reset token.
+    If you did not request this token, please disregard this email.
+    Token:
+    {{.Token}}
+
+{{end}}

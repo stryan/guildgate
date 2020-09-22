@@ -47,7 +47,7 @@ func signup(res http.ResponseWriter, req *http.Request) {
 
 	if Conf.Secret != "" && Conf.Secret != secret {
 		//Checking it as a token
-		err := validateToken(secret)
+		_, err := validateToken(secret)
 		if err != nil {
 			log.Printf("Bad secret entered: %v\n", err)
 			res.Write([]byte("Get a load of this guy, not knowing the secret code"))

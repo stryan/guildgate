@@ -30,7 +30,7 @@ func generateToken(sponsor string) (string, error) {
 	}
 }
 
-func validateToken(tok string) error {
+func validateToken(tok string) (string, error) {
 	token, err := jwt.ParseWithClaims(
 		tok,
 		&tokenClaim{},
@@ -39,15 +39,15 @@ func validateToken(tok string) error {
 		},
 	)
 	if err != nil {
-		return err
+		return "", err
 	}
 	claims, ok := token.Claims.(*tokenClaim)
 	if !ok {
-		return errors.New("Invalid token sponsor passed")
+		return "", errors.New("Invalid token sponsor passed")
 	}
 	if claims.ExpiresAt < time.Now().UTC().Unix() {
-		return errors.New("Token has expired")
+		return "", errors.New("Token has expired")
 	}
 	log.Printf("Valid token received; sponsored by %v\n", claims.Sponsor)
-	return nil
+	return claims.Sponsor, nil
 }

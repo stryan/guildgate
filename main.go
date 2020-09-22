@@ -26,8 +26,14 @@ func main() {
 	router.HandleFunc("/login", login).Methods("POST")
 	router.HandleFunc("/logout", logoutPage).Methods("GET")
 	router.HandleFunc("/token", tokenPage).Methods("GET")
+	router.HandleFunc("/passwordreset", resetPageFront).Methods("GET")
+	router.HandleFunc("/passwordreset", resetLookup).Methods("POST")
+	router.HandleFunc("/passwordresetform", resetPageBack).Methods("GET")
+	router.HandleFunc("/passwordresetform", reset).Methods("POST")
+	router.HandleFunc("/resetsuccess", resetSuccessPage).Methods("GET")
+	router.HandleFunc("/reseterror", resetErrorPage).Methods("GET")
 	log.Printf("Registering templates from %v/\n", Conf.TplPath)
-	tpl = template.Must(template.ParseGlob(Conf.TplPath + "/*.html"))
+	tpl = template.Must(template.ParseGlob(Conf.TplPath + "/*"))
 	log.Printf("Guildgate starting on %v\n", Conf.Port)
 	var err error
 	if Conf.Tls {
