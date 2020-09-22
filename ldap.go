@@ -67,7 +67,7 @@ func loginLDAPAccount(uname string, pwd string) error {
 		0,
 		0,
 		false,
-		fmt.Sprintf("(&(objectClass=organizationalPerson)(uid=%s))", uname),
+		fmt.Sprintf("(&(objectClass=organizationalPerson)(%s=%s))", Conf.Ldap.UserAttr, uname),
 		[]string{"dn"},
 		nil,
 	))
