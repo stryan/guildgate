@@ -26,6 +26,7 @@ func main() {
 	router.HandleFunc("/login", login).Methods("POST")
 	router.HandleFunc("/logout", logoutPage).Methods("GET")
 	router.HandleFunc("/token", tokenPage).Methods("GET")
+	router.HandleFunc("/profile", profilePage).Methods("GET")
 	router.HandleFunc("/passwordreset", resetPageFront).Methods("GET")
 	router.HandleFunc("/passwordreset", resetLookup).Methods("POST")
 	router.HandleFunc("/passwordresetform", resetPageBack).Methods("GET")

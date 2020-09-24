@@ -168,6 +168,48 @@ func findLDAPAccountByEmail(email string) (string, error) {
 	return entry.GetAttributeValue(Conf.Ldap.UserAttr), nil
 }
 
+func findLDAPAccountForDisplay(uname string) (User, error) {
+	url := Conf.Ldap.Url
+	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)
+	basedn := fmt.Sprintf("%v,%v", Conf.Ldap.UserOu, Conf.Ldap.LdapDc)
+	l, err := ldap.DialURL(url)
+	if err != nil {
+		return User{}, err
+	}
+	defer l.Close()
+	err = l.Bind(binddn, Conf.Ldap.LdapPass)
+	if err != nil {
+		return User{}, err
+	}
+	result, err := l.Search(ldap.NewSearchRequest(
+		basedn,
+		ldap.ScopeWholeSubtree,
+		ldap.NeverDerefAliases,
+		0,
+		0,
+		false,
+		fmt.Sprintf("(&(objectClass=organizationalPerson)(%s=%s))", Conf.Ldap.UserAttr, uname),
+		[]string{"cn", "sn", "givenName", "displayName", "mail", "employeeNumber"},
+		nil,
+	))
+	if err != nil {
+		return User{}, err
+	}
+	if len(result.Entries) != 1 {
+		err_text := fmt.Sprintf("Error finding user: Wanted 1 result, got %v\n", len(result.Entries))
+		return User{}, errors.New(err_text)
+	}
+	entry := result.Entries[0]
+	u := User{
+		Username:    entry.GetAttributeValue("cn"),
+		FirstName:   entry.GetAttributeValue("givenName"),
+		LastName:    entry.GetAttributeValue("sn"),
+		DisplayName: entry.GetAttributeValue("displayName"),
+		Email:       entry.GetAttributeValue("mail"),
+		ID:          entry.GetAttributeValue("employeeNumber"),
+	}
+	return u, nil
+}
 func findLDAPMaxID() (int, error) {
 	url := Conf.Ldap.Url
 	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)

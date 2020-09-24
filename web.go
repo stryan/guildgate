@@ -5,6 +5,32 @@ import (
 	"net/http"
 )
 
+func profilePage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /profile")
+	uname := getUserName(req)
+	if uname == "" {
+		http.Redirect(res, req, "/", 302)
+	}
+	user, err := findLDAPAccountForDisplay(uname)
+	if err != nil {
+		log.Printf("Error loading profile: %v\n", err)
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	data := struct {
+		Title    string
+		Username string
+		LoggedIn bool
+		User     User
+	}{
+		"Profile",
+		uname,
+		true,
+		user,
+	}
+	tpl.ExecuteTemplate(res, "profile", data)
+}
+
 func resetPageFront(res http.ResponseWriter, req *http.Request) {
 	log.Println("GET /passwordreset")
 	u := getUserName(req)

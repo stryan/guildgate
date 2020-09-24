@@ -1,0 +1,26 @@
+{{ define "profile" }}
+{{ template "header" .}}
+	<h1> Profile </h1>
+	<table>
+		<tr>
+			<th>Username: </th><td>{{ .User.Username }}</td>
+		</tr>
+		<tr>
+			<th>Display Name: </th><td>{{ .User.DisplayName }}</td>
+		</tr>
+		<tr>
+			<th>First Name: </th><td>{{ .User.FirstName }}</td>
+		</tr>
+		<tr>
+			<th>Last Name: </th><td>{{ .User.LastName }}</td>
+		</tr>
+		<tr>
+			<th>Email Address: </th><td>{{ .User.Email }}</td>
+		</tr>
+		<tr>
+			<th>User ID: </th><td>{{ .User.ID }}</td>
+		</tr>
+	</table>
+{{ template "footer" .}}
+{{end}}
+			
