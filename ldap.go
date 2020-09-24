@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/go-ldap/ldap"
 )
@@ -30,6 +31,10 @@ func createLDAPAccount(uname string, pwd string, email string) error {
 	addReq.Attribute("cn", []string{uname})
 	addReq.Attribute("mail", []string{email})
 	addReq.Attribute("sn", []string{"The Nameless"})
+	addReq.Attribute("givenName", []string{uname})
+	addReq.Attribute("employeeType", []string{"default"})
+	addReq.Attribute("employeeNumber", []string{strconv.Itoa(getNextId())})
+	addReq.Attribute("displayName", []string{uname})
 
 	if err := l.Add(addReq); err != nil {
 		log.Printf("error adding service:", addReq, err)
@@ -161,4 +166,57 @@ func findLDAPAccountByEmail(email string) (string, error) {
 	entry := result.Entries[0]
 
 	return entry.GetAttributeValue(Conf.Ldap.UserAttr), nil
+}
+
+func findLDAPMaxID() (int, error) {
+	url := Conf.Ldap.Url
+	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)
+	basedn := fmt.Sprintf("%v,%v", Conf.Ldap.UserOu, Conf.Ldap.LdapDc)
+
+	l, err := ldap.DialURL(url)
+	if err != nil {
+		return -1, err
+	}
+	defer l.Close()
+	err = l.Bind(binddn, Conf.Ldap.LdapPass)
+	if err != nil {
+		return -1, err
+	}
+	result, err := l.Search(ldap.NewSearchRequest(
+		basedn,
+		ldap.ScopeWholeSubtree,
+		ldap.NeverDerefAliases,
+		0,
+		0,
+		false,
+		fmt.Sprintf("(&(objectClass=organizationalPerson)(employeeNumber=*))"),
+		[]string{"employeeNumber"},
+		nil,
+	))
+	if err != nil {
+		return -1, err
+	}
+	maxId := 0
+	for _, entry := range result.Entries {
+		i, err := strconv.Atoi(entry.GetAttributeValue("employeeNumber"))
+		if err != nil {
+			return -1, err
+		}
+		if i > maxId {
+			maxId = i
+		}
+	}
+	return maxId + 1, nil
+
+}
+
+func getNextId() int {
+	if Conf.MaxID == 0 {
+		return -1
+	}
+	Conf.lock.Lock()
+	i := Conf.MaxID
+	Conf.MaxID = Conf.MaxID + 1
+	Conf.lock.Unlock()
+	return i
 }

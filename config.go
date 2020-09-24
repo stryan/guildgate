@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"sync"
 
 	"github.com/spf13/viper"
 )
@@ -31,6 +32,8 @@ type Config struct {
 	Key     string
 	Cert    string
 	Port    string
+	MaxID   int
+	lock    sync.Mutex
 }
 
 func validateConfigEntry(entry string, name string) bool {

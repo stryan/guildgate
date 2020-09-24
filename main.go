@@ -34,8 +34,16 @@ func main() {
 	router.HandleFunc("/reseterror", resetErrorPage).Methods("GET")
 	log.Printf("Registering templates from %v/\n", Conf.TplPath)
 	tpl = template.Must(template.ParseGlob(Conf.TplPath + "/*"))
+	log.Println("Performing LDAP checks")
+	log.Println("Loading max employeeNumber for account creation")
+	i, err := findLDAPMaxID()
+	if err != nil {
+		log.Printf("WARN: Unable to calculate max employeeNumber: %v\n", err)
+	} else {
+		Conf.MaxID = i
+		log.Printf("Max employeeNumber set to %v\n", Conf.MaxID)
+	}
 	log.Printf("Guildgate starting on %v\n", Conf.Port)
-	var err error
 	if Conf.Tls {
 		log.Printf("Starting TLS\n")
 		if Conf.Cert == "" {
