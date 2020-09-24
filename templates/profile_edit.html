@@ -1,0 +1,37 @@
+{{ define "profile_edit" }}
+{{ template "header" .}}
+<body>
+	<div>
+	<form method="POST" action="/profile/edit">
+	<table>
+		<tr>
+			<td>Username:</td>
+			<td>{{ .User.Username }}</td>
+		</tr>
+		<tr>
+			<td>Display Name:</td>
+			<td><input type="string" placeholder='{{ .User.DisplayName }}' name="displayname" value='{{ .User.DisplayName }}'></td>
+		</tr>
+		<tr>
+			<td>First Name:</td>
+			<td><input type="string" placeholder='{{ .User.FirstName }}' name="firstname" value='{{ .User.FirstName }}'></td>
+		</tr> 
+		<tr>
+			<td>Last Name:</td>
+			<td><input type="string" placeholder='{{ .User.LastName }}' name="lastname" value='{{ .User.LastName }}'></td>
+		</tr>
+		<tr>
+			<td>Email Address:</td>
+			<td><input type="mail"  placeholder=' {{ .User.Email }}' name="email" value='{{.User.Email }}'></td>
+		</tr>
+		<tr>
+			<td>User ID:</td>
+			<td>{{ .User.ID }}</td>
+		<tr>
+			<td><input type="submit" value="Submit"></td>
+		</tr>
+	</table>
+</form> 
+</div>
+{{ template "footer" .}}
+{{end}}

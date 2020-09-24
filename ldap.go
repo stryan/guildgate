@@ -210,6 +210,50 @@ func findLDAPAccountForDisplay(uname string) (User, error) {
 	}
 	return u, nil
 }
+func updateLDAPAccountByUser(user User) error {
+	url := Conf.Ldap.Url
+	userdn := fmt.Sprintf("%v=%v,%v,%v", Conf.Ldap.UserAttr, user.Username, Conf.Ldap.UserOu, Conf.Ldap.LdapDc)
+	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)
+	basedn := fmt.Sprintf("%v,%v", Conf.Ldap.UserOu, Conf.Ldap.LdapDc)
+	l, err := ldap.DialURL(url)
+	if err != nil {
+		return err
+	}
+	defer l.Close()
+	err = l.Bind(binddn, Conf.Ldap.LdapPass)
+	if err != nil {
+		return err
+	}
+	result, err := l.Search(ldap.NewSearchRequest(
+		basedn,
+		ldap.ScopeWholeSubtree,
+		ldap.NeverDerefAliases,
+		0,
+		0,
+		false,
+		fmt.Sprintf("(&(objectClass=organizationalPerson)(%s=%s))", Conf.Ldap.UserAttr, user.Username),
+		[]string{"dn"},
+		nil,
+	))
+	if err != nil {
+		return err
+	}
+	if len(result.Entries) != 1 {
+		err_text := fmt.Sprintf("Error finding login user: Wanted 1 result, got %v\n", len(result.Entries))
+		return errors.New(err_text)
+	}
+	modify := ldap.NewModifyRequest(userdn, nil)
+	modify.Replace("mail", []string{user.Email})
+	modify.Replace("givenName", []string{user.FirstName})
+	modify.Replace("sn", []string{user.LastName})
+	modify.Replace("displayName", []string{user.DisplayName})
+	err = l.Modify(modify)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func findLDAPMaxID() (int, error) {
 	url := Conf.Ldap.Url
 	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)
