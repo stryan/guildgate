@@ -46,7 +46,7 @@ func validateConfigEntry(entry string, name string) bool {
 
 func LoadConfig() (*Config, error) {
 	viper.SetConfigName("guildgate")
-	viper.AddConfigPath("/etc/")
+	viper.AddConfigPath("/etc/guildgate")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
