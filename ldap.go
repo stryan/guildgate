@@ -9,6 +9,34 @@ import (
 	"github.com/go-ldap/ldap"
 )
 
+func createLDAPMCAccount(uname, mcuname string) error {
+	if uname == "" || mcuname == "" {
+		log.Printf("error: missing field\n")
+		return errors.New("Missing field")
+	}
+	url := Conf.Ldap.Url
+	newdn := fmt.Sprintf("%v=%v,%v,%v", Conf.Ldap.UserAttr, mcuname, Conf.Ldap.MineUserOu, Conf.Ldap.LdapDc)
+	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)
+	maindn := fmt.Sprintf("%v=%v,%v,%v", Conf.Ldap.UserAttr, uname, Conf.Ldap.UserOu, Conf.Ldap.LdapDc)
+	l, err := ldap.DialURL(url)
+	if err != nil {
+		return err
+	}
+	defer l.Close()
+	err = l.Bind(binddn, Conf.Ldap.LdapPass)
+	if err != nil {
+		return err
+	}
+	addReq := ldap.NewAddRequest(newdn, []ldap.Control{})
+	addReq.Attribute("objectClass", []string{"top", "account"})
+	addReq.Attribute("seeAlso", []string{maindn})
+	if err := l.Add(addReq); err != nil {
+		log.Printf("error adding service:", addReq, err)
+		return errors.New("Error creating LDAP account")
+	}
+	return nil
+}
+
 func createLDAPAccount(uname string, pwd string, email string) error {
 	if uname == "" || pwd == "" || email == "" {
 		log.Printf("error: missing field\n")
@@ -167,7 +195,41 @@ func findLDAPAccountByEmail(email string) (string, error) {
 
 	return entry.GetAttributeValue(Conf.Ldap.UserAttr), nil
 }
-
+func findLDAPMCAccount(uname string) (string, error) {
+	url := Conf.Ldap.Url
+	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)
+	basedn := fmt.Sprintf("%v,%v", Conf.Ldap.MineUserOu, Conf.Ldap.LdapDc)
+	userdn := fmt.Sprintf("%v=%v,%v,%v", Conf.Ldap.UserAttr, uname, Conf.Ldap.UserOu, Conf.Ldap.LdapDc)
+	l, err := ldap.DialURL(url)
+	if err != nil {
+		return "", err
+	}
+	defer l.Close()
+	err = l.Bind(binddn, Conf.Ldap.LdapPass)
+	if err != nil {
+		return "", err
+	}
+	result, err := l.Search(ldap.NewSearchRequest(
+		basedn,
+		ldap.ScopeWholeSubtree,
+		ldap.NeverDerefAliases,
+		0,
+		0,
+		false,
+		fmt.Sprintf("(&(objectClass=account)(seeAlso=%s))", userdn),
+		[]string{"uid"},
+		nil,
+	))
+	if err != nil {
+		return "", err
+	}
+	if len(result.Entries) != 1 {
+		err_text := fmt.Sprintf("Error finding user: Wanted 1 result, got %v\n", len(result.Entries))
+		return "", errors.New(err_text)
+	}
+	entry := result.Entries[0]
+	return entry.GetAttributeValue("uid"), nil
+}
 func findLDAPAccountForDisplay(uname string) (User, error) {
 	url := Conf.Ldap.Url
 	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)

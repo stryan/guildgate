@@ -55,6 +55,65 @@ func profileEditPage(res http.ResponseWriter, req *http.Request) {
 	}
 	tpl.ExecuteTemplate(res, "profile_edit", data)
 }
+
+func minecraftPage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /minecraft")
+	u := getUserName(req)
+	if u == "" {
+		http.Redirect(res, req, "/", 302)
+	} else {
+		mcuser, err := findLDAPMCAccount(u)
+		mclink := true
+		if err != nil {
+			mclink = false
+			mcuser = "N/A"
+		}
+		data := struct {
+			Title            string
+			Username         string
+			LoggedIn         bool
+			Linked           bool
+			MinecraftAccount string
+		}{
+			"Link Minecraft Account",
+			u,
+			true,
+			mclink,
+			mcuser,
+		}
+		tpl.ExecuteTemplate(res, "minecraft", data)
+	}
+}
+func minecraftLinkSuccessPage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /minecraft/link/success")
+	data := struct {
+		Title    string
+		Username string
+		LoggedIn bool
+	}{
+		"Minecraft Link Success",
+		"",
+		true,
+	}
+	tpl.ExecuteTemplate(res, "minecraft_success", data)
+	return
+}
+func minecraftLinkErrorPage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /minecraft/link/error")
+	data := struct {
+		Title    string
+		Username string
+		LoggedIn bool
+		Error    string
+	}{
+		"Minecraft Link Failure",
+		"",
+		true,
+		"Undefined",
+	}
+	tpl.ExecuteTemplate(res, "minecraft_error", data)
+	return
+}
 func resetPageFront(res http.ResponseWriter, req *http.Request) {
 	log.Println("GET /passwordreset")
 	u := getUserName(req)

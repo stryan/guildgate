@@ -8,12 +8,13 @@ import (
 )
 
 type LdapConfig struct {
-	Url       string
-	AdminUser string
-	UserAttr  string
-	UserOu    string
-	LdapDc    string
-	LdapPass  string
+	Url        string
+	AdminUser  string
+	UserAttr   string
+	UserOu     string
+	MineUserOu string
+	LdapDc     string
+	LdapPass   string
 }
 
 type MailConfig struct {
@@ -64,6 +65,7 @@ func LoadConfig() (*Config, error) {
 	l.AdminUser = viper.GetString("adminUser")
 	l.UserAttr = viper.GetString("userAttr")
 	l.UserOu = viper.GetString("userOu")
+	l.MineUserOu = viper.GetString("mineUserOu")
 	l.LdapDc = viper.GetString("ldapDc")
 	l.LdapPass = viper.GetString("ldapPass")
 	c.Secret = viper.GetString("secret")

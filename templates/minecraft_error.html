@@ -1,0 +1,8 @@
+{{ define "minecraft_error" }}
+{{ template "header" .}}
+<p>Unable to link your Minecraft account due to the following error:</p>
+<p>{{.Error}}</p>
+<p>Please try again or let the admin know.</p>
+<p><a href="/">Return to homepage</a></p>
+{{template "footer" .}}
+{{ end }}
