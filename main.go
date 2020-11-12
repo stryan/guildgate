@@ -41,6 +41,10 @@ func main() {
 	router.HandleFunc("/reset/error", resetErrorPage).Methods("GET")
 	log.Printf("Registering templates from %v/\n", Conf.TplPath)
 	tpl = template.Must(template.ParseGlob(Conf.TplPath + "/*"))
+	if Conf.UserTplPath != "" {
+		log.Printf("Registering user templates from %v/\n", Conf.UsrTplPath)
+		tpl = template.Must(tpl.ParseGlob(Conf.UserTplPath + "/*"))
+	}
 	log.Println("Performing LDAP checks")
 	log.Println("Loading max employeeNumber for account creation")
 	i, err := findLDAPMaxID()

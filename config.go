@@ -25,16 +25,17 @@ type MailConfig struct {
 }
 
 type Config struct {
-	Ldap    *LdapConfig
-	Mail    *MailConfig
-	Secret  string
-	TplPath string
-	Tls     bool
-	Key     string
-	Cert    string
-	Port    string
-	MaxID   int
-	lock    sync.Mutex
+	Ldap        *LdapConfig
+	Mail        *MailConfig
+	Secret      string
+	TplPath     string
+	UserTplPath string
+	Tls         bool
+	Key         string
+	Cert        string
+	Port        string
+	MaxID       int
+	lock        sync.Mutex
 }
 
 func validateConfigEntry(entry string, name string) bool {
@@ -74,6 +75,7 @@ func LoadConfig() (*Config, error) {
 	c.Key = viper.GetString("tls_key")
 	c.Cert = viper.GetString("tls_cert")
 	c.TplPath = viper.GetString("templates_path")
+	c.UserTplPath = viper.GetString("user_templates_path")
 	m.SmtpServer = viper.GetString("SmtpServer")
 	m.Username = viper.GetString("SmtpUsername")
 	m.Password = viper.GetString("SmtpPassword")
