@@ -10,12 +10,12 @@ import (
 )
 
 func resetLookup(res http.ResponseWriter, req *http.Request) {
-	log.Println("POST /passwordreset")
+	log.Println("POST /reset")
 	email := req.FormValue("email")
 	uname, err := findLDAPAccountByEmail(email)
 	if err != nil {
 		log.Printf("Error while looking up account to email password reset to: %v\n. Account may not exist", err)
-		http.Redirect(res, req, "/passwordresetform", 303)
+		http.Redirect(res, req, "/reset/form", 303)
 	}
 	if uname == "" {
 		log.Printf("Error while looking up account to email password reset to: %v\n", err)
@@ -38,7 +38,7 @@ func resetLookup(res http.ResponseWriter, req *http.Request) {
 		}
 	}()*/
 	log.Println("Redirecting to next part of password reset")
-	http.Redirect(res, req, "/passwordresetform", 303)
+	http.Redirect(res, req, "/reset/form", 303)
 }
 func reset(res http.ResponseWriter, req *http.Request) {
 	token := req.FormValue("token")
@@ -47,7 +47,7 @@ func reset(res http.ResponseWriter, req *http.Request) {
 	user, err := validateToken(token)
 	if err != nil {
 		log.Printf("Error validing password reset token: %v\n", err)
-		http.Redirect(res, req, "/reseterror", 302)
+		http.Redirect(res, req, "/reset/error", 302)
 		return
 	}
 	if user == "" {
@@ -59,11 +59,11 @@ func reset(res http.ResponseWriter, req *http.Request) {
 	err = resetLDAPAccountPassword(user, newPass)
 	if err == nil {
 		log.Printf("reset password for %v\n", user)
-		http.Redirect(res, req, "/resetsuccess", 302)
+		http.Redirect(res, req, "/reset/success", 302)
 		return
 	} else {
 		log.Printf("failed to reset password for %v:%v\n", user, err)
-		http.Redirect(res, req, "/reseterror", 302)
+		http.Redirect(res, req, "/reset/error", 302)
 		return
 	}
 

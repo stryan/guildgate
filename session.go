@@ -50,7 +50,8 @@ func signup(res http.ResponseWriter, req *http.Request) {
 		_, err := validateToken(secret)
 		if err != nil {
 			log.Printf("Bad secret entered: %v\n", err)
-			res.Write([]byte("Get a load of this guy, not knowing the secret code"))
+			genericErrorPage(res, "User Creation Failure", "Unregistered", false, "Invalid Secret Token.", "to create account")
+
 			return
 		}
 	}
@@ -58,10 +59,10 @@ func signup(res http.ResponseWriter, req *http.Request) {
 	log.Printf("Attempting to create account for %v", username)
 	err := createLDAPAccount(username, password, email)
 	if err == nil {
-		res.Write([]byte("User created!"))
+		genericSuccessPage(res, "User Created", "Unregistered", false, "User created")
 		return
 	} else {
-		res.Write([]byte("Failure to create account"))
+		genericErrorPage(res, "User Creation Failure", "Unregistered", false, err.Error(), "to create account")
 		return
 	}
 }
@@ -73,7 +74,7 @@ func login(res http.ResponseWriter, req *http.Request) {
 	err := loginLDAPAccount(username, password)
 	if err != nil {
 		log.Printf("Error logging in user %v: %v\n", username, err)
-		res.Write([]byte("Error logging in. Incorrect password?"))
+		genericErrorPage(res, "Login Failure", "Unregistered", false, err.Error(), "to login")
 		return
 	} else {
 		setSession(username, res)

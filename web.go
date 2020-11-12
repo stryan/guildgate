@@ -86,36 +86,24 @@ func minecraftPage(res http.ResponseWriter, req *http.Request) {
 }
 func minecraftLinkSuccessPage(res http.ResponseWriter, req *http.Request) {
 	log.Println("GET /minecraft/link/success")
-	data := struct {
-		Title    string
-		Username string
-		LoggedIn bool
-	}{
-		"Minecraft Link Success",
-		"",
-		true,
+	u := getUserName(req)
+	if u == "" {
+		http.Redirect(res, req, "/404", 302)
 	}
-	tpl.ExecuteTemplate(res, "minecraft_success", data)
+	genericSuccessPage(res, "Minecraft Link Success", u, true, "Succesfully linked Minecraft account.")
 	return
 }
 func minecraftLinkErrorPage(res http.ResponseWriter, req *http.Request) {
 	log.Println("GET /minecraft/link/error")
-	data := struct {
-		Title    string
-		Username string
-		LoggedIn bool
-		Error    string
-	}{
-		"Minecraft Link Failure",
-		"",
-		true,
-		"Undefined",
+	u := getUserName(req)
+	if u == "" {
+		http.Redirect(res, req, "/404", 302)
 	}
-	tpl.ExecuteTemplate(res, "minecraft_error", data)
+	genericErrorPage(res, "Minecraft Link Failure", u, true, "Undefined", "link Minecraft account.")
 	return
 }
 func resetPageFront(res http.ResponseWriter, req *http.Request) {
-	log.Println("GET /passwordreset")
+	log.Println("GET /reset")
 	u := getUserName(req)
 	if u != "" {
 		http.Redirect(res, req, "/", 302) //TODO create password change form, direct to that
@@ -134,7 +122,7 @@ func resetPageFront(res http.ResponseWriter, req *http.Request) {
 }
 
 func resetPageBack(res http.ResponseWriter, req *http.Request) {
-	log.Println("GET /passwordresetform")
+	log.Println("GET /reset/form")
 	u := getUserName(req)
 	if u != "" {
 		http.Redirect(res, req, "/", 302) //TODO create password change form, direct to that
@@ -152,33 +140,13 @@ func resetPageBack(res http.ResponseWriter, req *http.Request) {
 	}
 }
 func resetSuccessPage(res http.ResponseWriter, req *http.Request) {
-	log.Println("GET /resetsuccess")
-	data := struct {
-		Title    string
-		Username string
-		LoggedIn bool
-	}{
-		"Reset Password Success",
-		"Unregistered",
-		false,
-	}
-	tpl.ExecuteTemplate(res, "reset_success", data)
+	log.Println("GET /reset/success")
+	genericSuccessPage(res, "Reset Password Success", "Unregistered", false, "Succesfully Reset Password")
 	return
 }
 func resetErrorPage(res http.ResponseWriter, req *http.Request) {
-	log.Println("GET /reseterror")
-	data := struct {
-		Title    string
-		Username string
-		LoggedIn bool
-		Error    string
-	}{
-		"Reset Password Failure",
-		"Unregistered",
-		false,
-		"Undefined",
-	}
-	tpl.ExecuteTemplate(res, "reset_error", data)
+	log.Println("GET /reset/error")
+	genericErrorPage(res, "Reset Password Failure", "Unregistered", false, "Undefined", "reset password")
 	return
 }
 func signupPage(res http.ResponseWriter, req *http.Request) {
@@ -272,4 +240,37 @@ func homePage(res http.ResponseWriter, req *http.Request) {
 	}
 
 	tpl.ExecuteTemplate(res, "index", data)
+}
+
+func genericSuccessPage(res http.ResponseWriter, title string, uname string, login bool, action string) {
+	data := struct {
+		Title    string
+		Username string
+		LoggedIn bool
+		Action   string
+	}{
+		title,
+		uname,
+		login,
+		action,
+	}
+	tpl.ExecuteTemplate(res, "generic_success", data)
+	return
+}
+func genericErrorPage(res http.ResponseWriter, title string, uname string, login bool, err string, action string) {
+	data := struct {
+		Title    string
+		Username string
+		LoggedIn bool
+		Error    string
+		Action   string
+	}{
+		title,
+		uname,
+		login,
+		err,
+		action,
+	}
+	tpl.ExecuteTemplate(res, "generic_error", data)
+	return
 }
