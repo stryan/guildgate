@@ -42,7 +42,7 @@ func main() {
 	log.Printf("Registering templates from %v/\n", Conf.TplPath)
 	tpl = template.Must(template.ParseGlob(Conf.TplPath + "/*"))
 	if Conf.UserTplPath != "" {
-		log.Printf("Registering user templates from %v/\n", Conf.UsrTplPath)
+		log.Printf("Registering user templates from %v/\n", Conf.UserTplPath)
 		tpl = template.Must(tpl.ParseGlob(Conf.UserTplPath + "/*"))
 	}
 	log.Println("Performing LDAP checks")
