@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -32,7 +33,7 @@ func generateToken(sponsor string) (string, error) {
 
 func validateToken(tok string) (string, error) {
 	token, err := jwt.ParseWithClaims(
-		tok,
+		strings.TrimSpace(tok),
 		&tokenClaim{},
 		func(token *jwt.Token) (interface{}, error) {
 			return []byte(Conf.Secret), nil

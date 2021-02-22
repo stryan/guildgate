@@ -30,13 +30,13 @@ func resetLookup(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 	log.Printf("Sending password reset email to %v\n", email)
-	/*go func() {
+	go func() {
 		err = sendMail(email, uname, token)
 		if err != nil {
 			log.Printf("Error sending password reset email %v\n", err)
 			http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
-	}()*/
+	}()
 	log.Println("Redirecting to next part of password reset")
 	http.Redirect(res, req, "/reset/form", 303)
 }
@@ -84,7 +84,6 @@ func sendMail(recp string, uname string, token string) error {
 	m.SetHeader("From", Conf.Mail.Username)
 	m.SetHeader("To", recp)
 	m.SetHeader("Subject", "Identity Server Password Reset")
-	m.SetBody("text/html", "Hello <b>Bob</b> and <i>Cora</i>!")
 
 	msg := new(bytes.Buffer)
 
