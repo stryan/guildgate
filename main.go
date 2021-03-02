@@ -15,9 +15,11 @@ var cookieHandler = securecookie.New(
 	securecookie.GenerateRandomKey(64),
 	securecookie.GenerateRandomKey(32))
 var passwordTokenSet map[string]bool
+var GitCommit string
 
 func main() {
 	Conf, _ = LoadConfig()
+	version := GitCommit
 	log.Println("Loaded config")
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homePage).Methods("GET")
@@ -56,7 +58,7 @@ func main() {
 		log.Printf("Max employeeNumber set to %v\n", Conf.MaxID)
 	}
 	passwordTokenSet = make(map[string]bool)
-	log.Printf("Guildgate starting on %v\n", Conf.Port)
+	log.Printf("Guildgate v%v starting on %v\n", version, Conf.Port)
 	if Conf.Tls {
 		log.Printf("Starting TLS\n")
 		if Conf.Cert == "" {
