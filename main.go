@@ -14,6 +14,7 @@ var tpl *template.Template
 var cookieHandler = securecookie.New(
 	securecookie.GenerateRandomKey(64),
 	securecookie.GenerateRandomKey(32))
+var passwordTokenSet map[string]bool
 
 func main() {
 	Conf, _ = LoadConfig()
@@ -54,6 +55,7 @@ func main() {
 		Conf.MaxID = i
 		log.Printf("Max employeeNumber set to %v\n", Conf.MaxID)
 	}
+	passwordTokenSet = make(map[string]bool)
 	log.Printf("Guildgate starting on %v\n", Conf.Port)
 	if Conf.Tls {
 		log.Printf("Starting TLS\n")

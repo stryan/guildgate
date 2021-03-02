@@ -7,5 +7,7 @@
 <textarea id="token_area" name="generated_token" rows="4" cols="50">
 {{ .Token }}
 </textarea>
+<p>You can also share this link: <a href="http://localhost:8080/register?secret={{.TokenURL}}">http://localhost:8080/register?secret={{.TokenURL}}</a>
+</p>
 {{template "footer" .}}
 {{ end }}

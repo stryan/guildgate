@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"net/url"
 )
 
 func profilePage(res http.ResponseWriter, req *http.Request) {
@@ -124,17 +125,26 @@ func resetPageFront(res http.ResponseWriter, req *http.Request) {
 func resetPageBack(res http.ResponseWriter, req *http.Request) {
 	log.Println("GET /reset/form")
 	u := getUserName(req)
+	token := ""
 	if u != "" {
 		http.Redirect(res, req, "/", 302) //TODO create password change form, direct to that
 	} else {
+		keys, ok := req.URL.Query()["token"]
+		if !ok || len(keys[0]) < 1 {
+			token = ""
+		} else {
+			token = keys[0]
+		}
 		data := struct {
 			Title    string
 			Username string
 			LoggedIn bool
+			Token    string
 		}{
 			"Reset Password",
 			"Unregistered",
 			false,
+			token,
 		}
 		tpl.ExecuteTemplate(res, "reset_password_page_back", data)
 	}
@@ -152,17 +162,26 @@ func resetErrorPage(res http.ResponseWriter, req *http.Request) {
 func signupPage(res http.ResponseWriter, req *http.Request) {
 	log.Println("GET /register")
 	u := getUserName(req)
+	secret := ""
 	if u != "" {
 		http.Redirect(res, req, "/", 302)
 	} else {
+		keys, ok := req.URL.Query()["secret"]
+		if !ok || len(keys[0]) < 1 {
+			secret = ""
+		} else {
+			secret = keys[0]
+		}
 		data := struct {
 			Title    string
 			Username string
 			LoggedIn bool
+			Secret   string
 		}{
 			"Register",
 			"Unregistered",
 			false,
+			secret,
 		}
 		tpl.ExecuteTemplate(res, "register", data)
 	}
@@ -212,11 +231,13 @@ func tokenPage(res http.ResponseWriter, req *http.Request) {
 		Username string
 		LoggedIn bool
 		Token    string
+		TokenURL string
 	}{
 		"Token Generation",
 		u,
 		true,
 		token,
+		url.QueryEscape(token),
 	}
 	tpl.ExecuteTemplate(res, "token", data)
 }

@@ -6,4 +6,7 @@ Hi {{.Name}},
     Token:
     {{.Token}}
 
+    You may also use the following link:
+    http://localhost/reset/form?token={{.TokenURL}}
+
 {{end}}

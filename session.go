@@ -47,7 +47,7 @@ func signup(res http.ResponseWriter, req *http.Request) {
 
 	if Conf.Secret != "" && Conf.Secret != secret {
 		//Checking it as a token
-		_, err := validateToken(secret)
+		_, err := validateToken(secret, false)
 		if err != nil {
 			log.Printf("Bad secret entered: %v\n", err)
 			genericErrorPage(res, "User Creation Failure", "Unregistered", false, "Invalid Secret Token.", "to create account")

@@ -19,9 +19,10 @@
 			<td>Confirm Password:</td>
 			<td><input type="password" name="confirm_password" id="confirm_password" onchange="check()"/></td>
 			<td><span id='message'></span></td>
+			<td><input type="checkbox" onclick="showPass()">Show Passwords</td>
 		<tr>
-			<td>Secret:</td>
-			<td><input type="password" placeholder="secret" name="secret"></td>
+			<td>Secret Token:</td>
+			<td><input type="password" value="{{.Secret}}" name="secret"></td>
 		</tr>
 		<tr>
 			<td><input type="submit" value="Submit"></td>
@@ -45,6 +46,20 @@ function check() {
     } else {
         document.getElementById('message').innerHTML = "Passwords don't match";
     }
+}
+function showPass() {
+	var x = document.getElementById("password");
+	if (x.type === "password") {
+		x.type = "text";
+	} else {
+		x.type = "password";
+	}
+	var x = document.getElementById("confirm_password");
+	if (x.type === "password") {
+		x.type = "text";
+	} else {
+		x.type = "password";
+	}
 }
 	</script>
 {{ template "footer" .}}

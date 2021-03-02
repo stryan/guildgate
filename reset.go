@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"gopkg.in/gomail.v2"
 )
@@ -23,7 +24,7 @@ func resetLookup(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	log.Printf("Found user %v, generating password token\n", uname)
-	token, err := generateToken(uname)
+	token, err := generatePasswordToken(uname)
 	fmt.Println(token)
 	if err != nil {
 		log.Printf("Error generating password token %v\n", err)
@@ -44,7 +45,7 @@ func reset(res http.ResponseWriter, req *http.Request) {
 	token := req.FormValue("token")
 	newPass := req.FormValue("new_password")
 
-	user, err := validateToken(token)
+	user, err := validateToken(token, true)
 	if err != nil {
 		log.Printf("Error validing password reset token: %v\n", err)
 		http.Redirect(res, req, "/reset/error", 302)
@@ -74,10 +75,12 @@ func sendMail(recp string, uname string, token string) error {
 		Recipient string
 		Name      string
 		Token     string
+		TokenURL  string
 	}{
 		Recipient: recp,
 		Name:      uname,
 		Token:     token,
+		TokenURL:  url.QueryEscape(token),
 	}
 
 	m := gomail.NewMessage()
