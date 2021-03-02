@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 )
 
 func setSession(uname string, res http.ResponseWriter) {
@@ -57,7 +58,7 @@ func signup(res http.ResponseWriter, req *http.Request) {
 	}
 	//insert into LDAP
 	log.Printf("Attempting to create account for %v", username)
-	err := createLDAPAccount(username, password, email)
+	err := createLDAPAccount(strings.ToLower(username), password, email)
 	if err == nil {
 		genericSuccessPage(res, "User Created", "Unregistered", false, "User created")
 		return
@@ -68,7 +69,7 @@ func signup(res http.ResponseWriter, req *http.Request) {
 }
 
 func login(res http.ResponseWriter, req *http.Request) {
-	username := req.FormValue("username")
+	username := strings.ToLower(req.FormValue("username"))
 	password := req.FormValue("password")
 	log.Printf("Attempting login for user %v\n", username)
 	err := loginLDAPAccount(username, password)
