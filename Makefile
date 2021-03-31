@@ -11,7 +11,7 @@ guildgate: $(GOFILES)
 clean: 
 	rm -f guildgate
 
-install:
+install: guildgate
 	install -d $(DESTDIR)$(PREFIX)/bin
 	install -m 755 guildgate $(DESTDIR)$(PREFIX)/bin
 	install -d $(DESTDIR)$(PREFIX)/share/guildgate/templates
