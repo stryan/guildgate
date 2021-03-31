@@ -31,9 +31,8 @@ func profileEdit(res http.ResponseWriter, req *http.Request) {
 			log.Printf("Error updating user account: %v\n", err)
 			http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
-		} else {
-			http.Redirect(res, req, "/profile/view", 303)
 		}
 	}
+	http.Redirect(res, req, "/profile/view", 303)
 	return
 }
