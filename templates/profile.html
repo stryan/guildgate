@@ -1,6 +1,6 @@
 {{ define "profile" }}
 {{ template "header" .}}
-	<h1> Profile </h1>
+	<h1>User Profile </h1>
 	<table>
 		<tr>
 			<th>Username: </th><td>{{ .User.Username }}</td>
@@ -20,6 +20,13 @@
 		<tr>
 			<th>User ID: </th><td>{{ .User.ID }}</td>
 		</tr>
+
+	</table>
+	<h1>User Groups </h1>
+	<table>
+		{{range .User.FriendlyGroups}} 
+		<tr><th>Group: </th><td>{{.}}</td></tr>
+		{{end}}
 	</table>
 	<p><a href="/profile/edit">Edit Profile</a></p>
 {{ template "footer" .}}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/go-ldap/ldap"
 )
@@ -251,7 +252,7 @@ func findLDAPAccountForDisplay(uname string) (User, error) {
 		0,
 		false,
 		fmt.Sprintf("(&(objectClass=organizationalPerson)(%s=%s))", Conf.Ldap.UserAttr, uname),
-		[]string{"cn", "sn", "givenName", "displayName", "mail", "employeeNumber"},
+		[]string{"cn", "sn", "givenName", "displayName", "mail", "employeeNumber", "memberOf"},
 		nil,
 	))
 	if err != nil {
@@ -262,13 +263,23 @@ func findLDAPAccountForDisplay(uname string) (User, error) {
 		return User{}, errors.New(err_text)
 	}
 	entry := result.Entries[0]
+	groups := entry.GetAttributeValues("memberOf")
+	fg := make([]string, 0)
+	for _, group := range groups {
+		group_s := strings.Split(group, ",")
+		group_cn := group_s[0]
+		fg = append(fg, strings.Trim(group_cn, "cn="))
+	}
+
 	u := User{
-		Username:    entry.GetAttributeValue("cn"),
-		FirstName:   entry.GetAttributeValue("givenName"),
-		LastName:    entry.GetAttributeValue("sn"),
-		DisplayName: entry.GetAttributeValue("displayName"),
-		Email:       entry.GetAttributeValue("mail"),
-		ID:          entry.GetAttributeValue("employeeNumber"),
+		Username:       entry.GetAttributeValue("cn"),
+		FirstName:      entry.GetAttributeValue("givenName"),
+		LastName:       entry.GetAttributeValue("sn"),
+		DisplayName:    entry.GetAttributeValue("displayName"),
+		Email:          entry.GetAttributeValue("mail"),
+		ID:             entry.GetAttributeValue("employeeNumber"),
+		Groups:         groups,
+		FriendlyGroups: fg,
 	}
 	return u, nil
 }
