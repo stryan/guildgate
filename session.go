@@ -71,7 +71,6 @@ func signup(res http.ResponseWriter, req *http.Request) {
 func login(res http.ResponseWriter, req *http.Request) {
 	username := strings.ToLower(req.FormValue("username"))
 	password := req.FormValue("password")
-	log.Printf("Attempting login for user %v\n", username)
 	err := loginLDAPAccount(username, password)
 	if err != nil {
 		log.Printf("Error logging in user %v: %v\n", username, err)
@@ -79,6 +78,7 @@ func login(res http.ResponseWriter, req *http.Request) {
 		return
 	} else {
 		setSession(username, res)
+		log.Printf("Succesful logging in user %v\n", username)
 		http.Redirect(res, req, "/", 302)
 		return
 	}
