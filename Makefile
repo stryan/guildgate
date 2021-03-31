@@ -1,11 +1,11 @@
-
+GOFILES=$(wildcard *.go)
 #set variables
 GIT_COMMIT := $(shell git rev-list -1 HEAD)
 ifeq ($(PREFIX),) # PREFIX is environment variable, but if it is not set, then set default value
 	PREFIX := /usr/local
 endif
 
-guildgate:
+guildgate: $(GOFILES)
 	go build -ldflags "-X main.GitCommit=$(GIT_COMMIT)"
 
 clean: 
