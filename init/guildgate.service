@@ -6,10 +6,10 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 Restart=always
-RestartSec=1
+RestartSec=3
 User=root
 ExecStart=/usr/local/bin/guildgate
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -USR1 $MAINPID
 
 
 [Install]
