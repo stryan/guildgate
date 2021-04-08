@@ -3,6 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"text/template"
 
 	"github.com/gorilla/mux"
@@ -59,6 +62,18 @@ func main() {
 	}
 	passwordTokenSet = make(map[string]bool)
 	log.Printf("Guildgate v%v starting on %v\n", version, Conf.Port)
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGUSR1)
+	go func() {
+		for {
+			<-sigs
+			log.Println("reloading templates on SIGUSR1")
+			tpl = template.Must(template.ParseGlob(Conf.TplPath + "/*"))
+			if Conf.UserTplPath != "" {
+				tpl = template.Must(tpl.ParseGlob(Conf.UserTplPath + "/*"))
+			}
+		}
+	}()
 	if Conf.Tls {
 		log.Printf("Starting TLS\n")
 		if Conf.Cert == "" {
