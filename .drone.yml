@@ -1,0 +1,28 @@
+kind: pipeline
+name: default
+
+steps:
+- name: build 
+  image: golang
+  commands:
+  - make
+
+- name: create release tar
+  image: golang
+  commands:
+    - mkdir dist
+    - tar -czf dist/release-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz init/guildgate.service config.yaml.sample guildgate
+  when:
+    event: tag
+
+- name: release
+  image: plugins/gitea-release
+  settings:
+    api_key:
+      from_secret: gitea_token
+    files:
+      - dist/*
+    base_url: https://git.saintnet.tech
+  when:
+    event: tag
+
