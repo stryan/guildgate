@@ -29,7 +29,7 @@
       - name: installing guildgate binary
         copy:
           remote_src: yes
-          src: "{{ tempfolder_1.path }}/guildgate"
+          src: "{{ tempfolder_1.path }}/usr/local/bin/guildgate"
           dest: /usr/local/bin/
           mode: '0755'
         register: new_binary
@@ -40,6 +40,12 @@
           src: "{{ tempfolder_1.path }}/init/guildgate.service"
           dest: /etc/systemd/system/guildgate.service
         register: new_unit
+
+      - name: installing default templates
+        copy:
+          remote_src: yes
+          src: "{{ tempfolder_1.path}}/usr/local/share/guildgate/"
+          dest: /usr/local/share
 
   - name: reload systemd with new unit
     systemd:

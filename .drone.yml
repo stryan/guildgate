@@ -12,7 +12,7 @@ steps:
   commands:
     - mkdir dist build
     - DESTDIR=build make install
-    - tar -czf dist/release-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz build/*
+    - tar -czf dist/release-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz build/* init/*
   when:
     event: tag
 
