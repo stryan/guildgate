@@ -11,12 +11,10 @@ steps:
   image: golang
   commands:
     - mkdir dist build
-    - make install
+    - DESTDIR=build make install
     - tar -czf dist/release-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz build/*
   when:
     event: tag
-  environment:
-    DESTDIR: build
 
 - name: release
   image: plugins/gitea-release
