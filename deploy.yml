@@ -1,0 +1,53 @@
+---
+
+- hosts: localhost
+  tasks:                                                               
+
+  - name: check guildgate version
+    uri:
+      url: https://git.saintnet.tech/api/v1/repos/stryan/guildgate/releases?limit=1
+      return_content: true
+    register: guildgate_latest
+
+  - name: "downloading and installing guildgate {{ guildgate_latest.json[0].tag_name }}"
+    block:
+      - name: create temp directory
+        tempfile:
+          state: directory
+          suffix: dwn
+        register: tempfolder_1
+
+      - name: download guildgate
+        loop: "{{ guildgate_latest.json[0].assets }}"
+        when: "'amd64.tar.gz' in item.name"
+        unarchive:
+          remote_src: yes
+          src: "{{ item.browser_download_url }}"
+          dest: "{{ tempfolder_1.path }}"
+          keep_newer: yes
+
+      - name: installing guildgate binary
+        copy:
+          remote_src: yes
+          src: "{{ tempfolder_1.path }}/guildgate"
+          dest: /usr/local/bin/
+          mode: '0755'
+        register: new_binary
+
+      - name: installing unit file
+        copy:
+          remote_src: yes
+          src: "{{ tempfolder_1.path }}/init/guildgate.service"
+          dest: /etc/systemd/system/guildgate.service
+        register: new_unit
+
+  - name: reload systemd with new unit
+    systemd:
+      daemon_reload: yes
+    when: new_unit.changed or new_binary.changed
+
+  - name: start service
+    systemd:
+      name: guildgate
+      state: restarted
+    when: new_binary.changed

@@ -10,10 +10,13 @@ steps:
 - name: create release tar
   image: golang
   commands:
-    - mkdir dist
-    - tar -czf dist/release-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz init/guildgate.service config.yaml.sample guildgate
+    - mkdir dist build
+    - make install
+    - tar -czf dist/release-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz build/*
   when:
     event: tag
+  environment:
+    DESTDIR: build
 
 - name: release
   image: plugins/gitea-release
