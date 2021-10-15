@@ -11,7 +11,7 @@ steps:
   image: golang
   commands:
     - go mod vendor
-    - tar -czf release-source-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz * 
+    - tar -czf release-source-$DRONE_TAG.tar.gz * 
     - mkdir dist
     - mv release-source-$DRONE_TAG.tar.gz dist/
   when:
