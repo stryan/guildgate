@@ -10,9 +10,10 @@ steps:
 - name: create release-source tar
   image: golang
   commands:
-    - mkdir dist
     - go mod vendor
-    - tar --exclude='/dist' --exclude='/dist/*' -czf dist/release-source-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz * 
+    - tar -czf release-source-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz * 
+    - mkdir dist
+    - mv release-source-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz dist/
   when:
     event: tag
 
