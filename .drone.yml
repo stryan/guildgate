@@ -7,7 +7,15 @@ steps:
   commands:
   - make
 
-- name: create release tar
+- name: create release-source tar
+  image: golang
+  commands:
+    - go mod vendor
+    - tar -czf dist/release-source-$DRONE_TAG-DRONE_STAGE_ARCH.tar.gz *
+  when:
+    event: tag
+
+- name: create release-binary tar
   image: golang
   commands:
     - mkdir dist build
