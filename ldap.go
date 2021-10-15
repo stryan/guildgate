@@ -32,7 +32,7 @@ func createLDAPMCAccount(uname, mcuname string) error {
 	addReq.Attribute("objectClass", []string{"top", "account"})
 	addReq.Attribute("seeAlso", []string{maindn})
 	if err := l.Add(addReq); err != nil {
-		log.Printf("error adding service:", addReq, err)
+		log.Printf("error adding service:%v %v", addReq, err)
 		return errors.New("Error creating LDAP account")
 	}
 	return nil
@@ -40,7 +40,7 @@ func createLDAPMCAccount(uname, mcuname string) error {
 
 func createLDAPAccount(uname string, pwd string, email string) error {
 	if uname == "" || pwd == "" || email == "" {
-		log.Printf("error: missing field\n")
+		log.Println("error: missing field")
 		return errors.New("Missing field")
 	}
 	url := Conf.Ldap.Url
@@ -66,7 +66,7 @@ func createLDAPAccount(uname string, pwd string, email string) error {
 	addReq.Attribute("displayName", []string{uname})
 
 	if err := l.Add(addReq); err != nil {
-		log.Printf("error adding service:", addReq, err)
+		log.Printf("error adding service: %v %v", addReq, err)
 		return errors.New("Error creating LDAP account")
 	}
 
