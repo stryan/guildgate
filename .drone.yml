@@ -12,7 +12,7 @@ steps:
   commands:
     - mkdir dist
     - go mod vendor
-    - tar --exclude='./dist' -czf dist/release-source-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz * 
+    - tar --exclude='/dist' --exclude='/dist/*' -czf dist/release-source-$DRONE_TAG-$DRONE_STAGE_ARCH.tar.gz * 
   when:
     event: tag
 
