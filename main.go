@@ -45,6 +45,11 @@ func main() {
 	router.HandleFunc("/reset/form", reset).Methods("POST")
 	router.HandleFunc("/reset/success", resetSuccessPage).Methods("GET")
 	router.HandleFunc("/reset/error", resetErrorPage).Methods("GET")
+	router.HandleFunc("/change", changePageFront).Methods("GET")
+	router.HandleFunc("/change", change).Methods("POST")
+	router.HandleFunc("/change/success", changeSuccessPage).Methods("GET")
+	router.HandleFunc("/change/error", changeSuccessPage).Methods("GET")
+
 	log.Printf("Registering templates from %v/\n", Conf.TplPath)
 	tpl = template.Must(template.ParseGlob(Conf.TplPath + "/*"))
 	if Conf.UserTplPath != "" {

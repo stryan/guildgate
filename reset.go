@@ -57,16 +57,38 @@ func reset(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	log.Printf("Attempting to reset password for %v", user)
-	err = resetLDAPAccountPassword(user, newPass)
+	err = resetLDAPAccountPassword(user, "", newPass)
 	if err == nil {
 		log.Printf("reset password for %v\n", user)
 		http.Redirect(res, req, "/reset/success", 302)
 		return
-	} else {
-		log.Printf("failed to reset password for %v:%v\n", user, err)
-		http.Redirect(res, req, "/reset/error", 302)
+	}
+	log.Printf("failed to reset password for %v:%v\n", user, err)
+	http.Redirect(res, req, "/reset/error", 302)
+	return
+
+}
+
+func change(res http.ResponseWriter, req *http.Request) {
+	oldPass := req.FormValue("old_password")
+	newPass := req.FormValue("new_password")
+
+	user := getUserName(req)
+	if user == "" {
+		log.Printf("Error changing password without a username\n")
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+	log.Printf("Attempting to change password for %v", user)
+	err := resetLDAPAccountPassword(user, oldPass, newPass)
+	if err != nil {
+		log.Printf("failed to change password for %v:%v\n", user, err)
+		http.Redirect(res, req, "/change/error", 302)
+		return
+	}
+	log.Printf("change password for %v\n", user)
+	http.Redirect(res, req, "/change/success", 302)
+	return
 
 }
 

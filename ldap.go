@@ -119,7 +119,7 @@ func loginLDAPAccount(uname string, pwd string) error {
 	return nil
 }
 
-func resetLDAPAccountPassword(user string, newPass string) error {
+func resetLDAPAccountPassword(user string, oldPass, newPass string) error {
 	url := Conf.Ldap.Url
 	userdn := fmt.Sprintf("%v=%v,%v,%v", Conf.Ldap.UserAttr, user, Conf.Ldap.UserOu, Conf.Ldap.LdapDc)
 	binddn := fmt.Sprintf("%v,%v", Conf.Ldap.AdminUser, Conf.Ldap.LdapDc)
@@ -151,7 +151,7 @@ func resetLDAPAccountPassword(user string, newPass string) error {
 		err_text := fmt.Sprintf("Error finding login user: Wanted 1 result, got %v\n", len(result.Entries))
 		return errors.New(err_text)
 	}
-	passwordModifyRequest := ldap.NewPasswordModifyRequest(userdn, "", newPass)
+	passwordModifyRequest := ldap.NewPasswordModifyRequest(userdn, oldPass, newPass)
 	_, err = l.PasswordModify(passwordModifyRequest)
 
 	if err != nil {

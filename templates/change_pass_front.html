@@ -1,0 +1,59 @@
+{{ define "change_password_page_front" }}
+{{ template "header" .}}
+<body>
+	<div>
+	<form method="POST" action="/change">
+	<table>
+		<tr>
+			<td>Current Password:</td>
+			<td><input type="password" id="old_password" name="old_password"</td>
+		</tr>
+		<tr>
+			<td>New Password:</td>
+			<td><input type="password" id="new_password" name="new_password" pattern="(?=.*\d)(?=.*[a-z]).{8,}" title="Must contain at least one number and at least 8 or more characters" required></td>
+		</tr>
+		<tr>
+			<td>Confirm New Password:</td>
+			<td><input type="password" name="confirm_password" id="confirm_password" onchange="check()"/></td>
+			<td><span id='message'></span></td>
+			<td><input type="checkbox" onclick="showPass()">Show Passwords</td>
+		<tr>
+			<td><input type="submit" value="Submit"></td>
+		</tr>
+	</table>
+</form> 
+</div>
+
+<div id="requirements">
+  <h3>Password must contain the following:</h3>
+  <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+  <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+  <p id="number" class="invalid">A <b>number</b></p>
+  <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+</div>
+	<script>
+function check() {
+    if(document.getElementById('password').value ===
+            document.getElementById('confirm_password').value) {
+        document.getElementById('message').innerHTML = "Passwords match";
+    } else {
+        document.getElementById('message').innerHTML = "Passwords don't match";
+    }
+}
+function showPass() {
+	var x = document.getElementById("password");
+	if (x.type === "password") {
+		x.type = "text";
+	} else {
+		x.type = "password";
+	}
+	var x = document.getElementById("confirm_password");
+	if (x.type === "password") {
+		x.type = "text";
+	} else {
+		x.type = "password";
+	}
+}
+	</script>
+{{ template "footer" .}}
+{{ end }}

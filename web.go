@@ -103,6 +103,39 @@ func minecraftLinkErrorPage(res http.ResponseWriter, req *http.Request) {
 	genericErrorPage(res, "Minecraft Link Failure", u, true, "Undefined", "link Minecraft account.")
 	return
 }
+
+func changePageFront(res http.ResponseWriter, req *http.Request) {
+	u := getUserName(req)
+	if u == "" {
+		http.Redirect(res, req, "/reset", 302)
+	}
+	data := struct {
+		Title    string
+		Username string
+		LoggedIn bool
+	}{
+		"Change Password",
+		u,
+		true,
+	}
+	tpl.ExecuteTemplate(res, "change_password_page_front", data)
+}
+
+func changeSuccessPage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /change/success")
+	u := getUserName(req)
+
+	genericSuccessPage(res, "Change Password Success", u, false, "Succesfully Changed Password")
+	return
+}
+func changeErrorPage(res http.ResponseWriter, req *http.Request) {
+	log.Println("GET /change/error")
+	u := getUserName(req)
+
+	genericErrorPage(res, "Change Password Failure", u, false, "Undefined", "reset password")
+	return
+}
+
 func resetPageFront(res http.ResponseWriter, req *http.Request) {
 	log.Println("GET /reset")
 	u := getUserName(req)
